@@ -100,7 +100,7 @@
             bottom: 40px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
-            z-index: 20; /* above everything */
+            z-index: 20;
             opacity: 0;
             transition: opacity 0.8s ease, transform 0.8s ease;
             pointer-events: none;
@@ -110,7 +110,6 @@
             gap: 12px;
             width: 90%;
             max-width: 420px;
-            /* It will be centered horizontally at all times */
         }
 
         .cta-wrapper.visible {
@@ -128,9 +127,7 @@
             border: 3px solid rgba(255, 255, 255, 0.25);
             box-shadow: 0 0 30px rgba(0, 255, 200, 0.3);
             display: block;
-            pointer-events: none; /* click goes to the button */
             transition: transform 0.3s ease;
-            /* Glow is applied via the container's ::before */
         }
 
         .face-circle:hover {
@@ -158,7 +155,6 @@
             transition: transform 0.25s ease, box-shadow 0.25s ease;
             box-shadow: 0 0 40px rgba(0, 255, 200, 0.3);
             letter-spacing: 0.5px;
-            /* The glowing border is drawn by ::before */
         }
 
         .cta-button:hover {
@@ -174,14 +170,13 @@
             align-items: center;
             gap: 8px;
             width: 100%;
-            /* The ::before will draw the glowing ring around the whole group */
         }
 
         .cta-glow-container::before {
             content: "";
             position: absolute;
             inset: -6px;
-            border-radius: 60px; /* matches button */
+            border-radius: 60px;
             padding: 6px;
             background: conic-gradient(
                 from 0deg,
@@ -198,14 +193,12 @@
             animation: rotateBorder 3s linear infinite;
             pointer-events: none;
             z-index: 1;
-            /* Only for the button, not the face circle – we'll make face circle glow separately */
         }
 
-        /* We want the face circle to have its own glow, separate from the button's glow */
         .face-circle-wrapper {
             position: relative;
             display: inline-block;
-            pointer-events: none; /* clicks pass through to the button */
+            cursor: pointer;
         }
 
         .face-circle-wrapper::before {
@@ -448,7 +441,7 @@
             }
         }
 
-        /* Fullscreen: ensure CTA stays visible and on top */
+        /* Fullscreen: ensure CTA stays visible */
         .plyr--fullscreen .cta-wrapper {
             z-index: 9999 !important;
         }
@@ -477,12 +470,11 @@
             </video>
         </div>
 
-        <!-- ===== CTA WRAPPER (centered, prominent) ===== -->
+        <!-- ===== CTA WRAPPER ===== -->
         <div class="cta-wrapper" id="ctaWrapper">
-            <!-- Glow container groups picture + button -->
             <div class="cta-glow-container">
-                <!-- Face picture (separate circle, above the button) -->
-                <div class="face-circle-wrapper">
+                <!-- Face picture (clickable) -->
+                <div class="face-circle-wrapper" id="faceWrapper">
                     <img
                         class="face-circle"
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-BLuNJCpJfwf1zxFaiCllOlSRaqxS6L.png"
@@ -491,7 +483,7 @@
                     />
                 </div>
 
-                <!-- The big intrusive button -->
+                <!-- The big button -->
                 <button class="cta-button" id="ctaButton">
                     <span class="cta-price">$19.5k</span>
                     <span class="cta-phone-icon">📞</span>
@@ -499,7 +491,7 @@
                 </button>
             </div>
 
-            <!-- Legal protection link -->
+            <!-- Legal link -->
             <button class="legal-link" id="legalLink">Legal & Terms</button>
         </div>
     </div>
@@ -534,7 +526,7 @@
         });
 
         // =============================================
-        // 2. SYNC BACKGROUND VIDEO WITH MAIN VIDEO
+        // 2. SYNC BACKGROUND VIDEO
         // =============================================
         const bgVideo = document.querySelector('.video-background');
         const mainVideo = document.querySelector('#player');
@@ -555,7 +547,7 @@
         });
 
         // =============================================
-        // 3. AMBIENT CANVAS GLOW (Color Sampling)
+        // 3. AMBIENT CANVAS GLOW
         // =============================================
         const canvas = document.getElementById('ambientCanvas');
         const ctx = canvas.getContext('2d');
@@ -631,13 +623,13 @@
         });
 
         // =============================================
-        // 5. CTA ACTION: DOWNLOAD vCard + SCHEDULE CALL
+        // 5. CTA ACTION: DOWNLOAD vCard + CALL (SILENTLY)
         // =============================================
-        const phoneNumber = '6022816259';
+        const phoneNumber = '+16022816259'; // International format for reliability
         const contactName = 'Past Owner of My RV';
 
         function triggerDownloadAndCall() {
-            // --- Generate and download vCard ---
+            // --- 1. Download the vCard immediately ---
             const vcard = `BEGIN:VCARD
         VERSION:3.0
         FN:${contactName}
@@ -654,39 +646,29 @@
             document.body.removeChild(link);
             setTimeout(() => URL.revokeObjectURL(url), 100);
 
-            // --- Schedule the phone call after 10 seconds ---
+            // --- 2. Show a quick "Saved!" feedback (no countdown) ---
             const button = document.getElementById('ctaButton');
             const originalHTML = button.innerHTML;
-            // Show countdown on the button
-            button.innerHTML = `<span style="font-size:28px;color:#00ffc8;">⏳</span> <span style="color:#fff;font-size:24px;">Calling in 10s...</span>`;
+            button.innerHTML = `✅ Saved!`;
             button.style.pointerEvents = 'none';
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.style.pointerEvents = 'auto';
+            }, 2000);
 
-            let countdown = 10;
-            const interval = setInterval(() => {
-                countdown--;
-                if (countdown > 0) {
-                    button.innerHTML = `<span style="font-size:28px;color:#00ffc8;">⏳</span> <span style="color:#fff;font-size:24px;">Calling in ${countdown}s...</span>`;
-                } else {
-                    clearInterval(interval);
-                    // Initiate the phone call
-                    window.location.href = `tel:${phoneNumber}`;
-                    // Restore the button after a moment (or leave as is)
-                    setTimeout(() => {
-                        button.innerHTML = originalHTML;
-                        button.style.pointerEvents = 'auto';
-                    }, 500);
-                }
-            }, 1000);
+            // --- 3. Silently wait 10 seconds, then trigger the call ---
+            setTimeout(() => {
+                // This will open the phone dialer on mobile, or a prompt on desktop
+                window.location.href = `tel:${phoneNumber}`;
+            }, 10000);
         }
 
-        // Attach click to the button and the face picture (we'll make the picture clickable too)
+        // Attach click listeners to the button AND the face picture wrapper
         document.getElementById('ctaButton').addEventListener('click', triggerDownloadAndCall);
-        // Make the face picture clickable by wrapping it in a clickable div or using pointer-events
-        // We'll set pointer-events: auto on the wrapper and attach listener
-        document.querySelector('.face-circle-wrapper').addEventListener('click', triggerDownloadAndCall);
-        // Also the whole glow container for extra area
+        document.getElementById('faceWrapper').addEventListener('click', triggerDownloadAndCall);
+
+        // Also catch clicks on the glow container background (just in case)
         document.querySelector('.cta-glow-container').addEventListener('click', (e) => {
-            // But avoid double-trigger if the button or face was clicked directly
             if (e.target.closest('.cta-button') || e.target.closest('.face-circle-wrapper')) return;
             triggerDownloadAndCall();
         });
@@ -730,8 +712,7 @@
             bgVideo.play().catch(() => {});
         });
 
-        console.log('🎬 Mega CTA mode: centered, huge, and visible in fullscreen.');
-        console.log('📞 Click the picture or the button to download and schedule a call.');
+        console.log('✅ Mega CTA: Silent 10s delay, no visible countdown.');
     </script>
 
 </body>
