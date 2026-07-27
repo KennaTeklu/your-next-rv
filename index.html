@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My RV Video</title>
 
-    <!-- Plyr CSS -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
     <style>
@@ -21,11 +20,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* ===== VIDEO WRAPPER ===== */
         .video-wrapper {
             position: relative;
             width: 100vw;
@@ -37,39 +35,34 @@
             overflow: hidden;
         }
 
-        /* ===== BACKGROUND BLUR (VIBES WITH VIDEO COLORS) ===== */
-        .video-background {
+        /* ===== AMBIENT GLOW CANVAS ===== */
+        .ambient-glow {
             position: absolute;
             top: 50%;
             left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
+            width: 80%;
+            height: 80%;
             transform: translate(-50%, -50%) scale(1.2);
-            object-fit: cover;
-            filter: blur(50px) brightness(0.5);
+            filter: blur(60px) brightness(0.7);
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
+            opacity: 0.9;
+            border-radius: 50%;
         }
 
-        /* ===== MAIN VIDEO - FULLY VISIBLE ===== */
+        /* ===== MAIN VIDEO ===== */
         .video-container {
             position: relative;
             z-index: 2;
-            width: auto;
             height: 90vh;
-            max-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Make Plyr respect the container size */
         .video-container .plyr {
-            width: auto;
             height: 100%;
-            max-height: 90vh;
+            width: auto;
         }
 
         .video-container .plyr__video-wrapper {
@@ -80,17 +73,10 @@
         .video-container video {
             height: 100% !important;
             width: auto !important;
-            max-height: 90vh;
             object-fit: contain !important;
         }
 
-        /* Hide Plyr's default poster/overlay that might crop */
-        .plyr__poster {
-            background-size: contain !important;
-            background-position: center !important;
-        }
-
-        /* ===== CTA BUTTON WRAPPER ===== */
+        /* ===== CTA BUTTON ===== */
         .cta-wrapper {
             position: absolute;
             bottom: 100px;
@@ -108,7 +94,6 @@
             pointer-events: auto;
         }
 
-        /* ===== PULSING NEON BUTTON ===== */
         .cta-button {
             display: flex;
             align-items: center;
@@ -121,7 +106,6 @@
             color: #fff;
             font-size: 22px;
             font-weight: 700;
-            font-family: inherit;
             cursor: pointer;
             position: relative;
             transition: transform 0.2s ease;
@@ -132,21 +116,13 @@
             transform: scale(1.05);
         }
 
-        /* The glowing border ring */
         .cta-button::before {
             content: "";
             position: absolute;
             inset: -3px;
             border-radius: 60px;
             padding: 3px;
-            background: conic-gradient(
-                from 0deg,
-                #00ffc8,
-                #00d4ff,
-                #7b2ffc,
-                #ff6fd8,
-                #00ffc8
-            );
+            background: conic-gradient(from 0deg, #00ffc8, #00d4ff, #7b2ffc, #ff6fd8, #00ffc8);
             background-size: 300% 300%;
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
@@ -155,20 +131,12 @@
             pointer-events: none;
         }
 
-        /* The pulsing glow behind the button */
         .cta-button::after {
             content: "";
             position: absolute;
             inset: -8px;
             border-radius: 60px;
-            background: conic-gradient(
-                from 0deg,
-                rgba(0, 255, 200, 0.4),
-                rgba(0, 212, 255, 0.4),
-                rgba(123, 47, 252, 0.4),
-                rgba(255, 111, 216, 0.4),
-                rgba(0, 255, 200, 0.4)
-            );
+            background: conic-gradient(from 0deg, rgba(0, 255, 200, 0.4), rgba(0, 212, 255, 0.4), rgba(123, 47, 252, 0.4), rgba(255, 111, 216, 0.4), rgba(0, 255, 200, 0.4));
             background-size: 300% 300%;
             filter: blur(20px);
             animation: rotateBorder 3s linear infinite;
@@ -189,31 +157,22 @@
             }
         }
 
-        /* ===== BUTTON CONTENT ===== */
         .cta-price {
             color: #00ffc8;
             font-size: 24px;
         }
-
         .cta-phone-icon {
             font-size: 28px;
-            line-height: 1;
         }
-
         .cta-label {
             color: #fff;
             font-weight: 600;
             font-size: 16px;
-            letter-spacing: 0.5px;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .video-container {
                 height: 80vh;
-            }
-            .video-container video {
-                max-height: 80vh !important;
             }
             .cta-wrapper {
                 bottom: 80px;
@@ -240,19 +199,16 @@
             .cta-label {
                 font-size: 14px;
             }
-            .video-background {
-                filter: blur(40px) brightness(0.4);
-                min-height: 100%;
-                min-width: 100%;
+            .ambient-glow {
+                filter: blur(50px) brightness(0.6);
+                width: 90%;
+                height: 90%;
             }
         }
 
         @media (max-width: 480px) {
             .video-container {
                 height: 70vh;
-            }
-            .video-container video {
-                max-height: 70vh !important;
             }
             .cta-wrapper {
                 bottom: 70px;
@@ -264,22 +220,8 @@
             .cta-price {
                 font-size: 18px;
             }
-            .video-background {
-                filter: blur(30px) brightness(0.3);
-            }
-        }
-
-        /* Landscape phone - keep video visible */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .video-container {
-                height: 70vh;
-            }
-            .video-container video {
-                max-height: 70vh !important;
-            }
-            .cta-wrapper {
-                bottom: 40px;
-                right: 20px;
+            .ambient-glow {
+                filter: blur(40px) brightness(0.5);
             }
         }
     </style>
@@ -287,10 +229,8 @@
 <body>
 
     <div class="video-wrapper">
-        <!-- ===== BACKGROUND BLUR VIDEO ===== -->
-        <video class="video-background" autoplay muted playsinline>
-            <source src="myvideo.mp4" type="video/mp4" />
-        </video>
+        <!-- ===== AMBIENT GLOW CANVAS ===== -->
+        <canvas id="ambientCanvas" class="ambient-glow"></canvas>
 
         <!-- ===== MAIN VIDEO ===== -->
         <div class="video-container">
@@ -310,7 +250,6 @@
         </div>
     </div>
 
-    <!-- ===== PLYR ===== -->
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
     <script>
@@ -318,46 +257,80 @@
         // 1. INITIALIZE PLYR
         // =============================================
         const player = new Plyr('#player', {
-            controls: [
-                'play-large',
-                'play',
-                'progress',
-                'current-time',
-                'duration',
-                'mute',
-                'volume',
-                'fullscreen'
-            ],
+            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'fullscreen'],
             autoplay: false,
             muted: false
         });
 
         // =============================================
-        // 2. SYNC BACKGROUND VIDEO WITH MAIN VIDEO
+        // 2. AMBIENT CANVAS GLOW (Color Sampling)
         // =============================================
-        const bgVideo = document.querySelector('.video-background');
+        const canvas = document.getElementById('ambientCanvas');
+        const ctx = canvas.getContext('2d');
         const mainVideo = document.querySelector('#player');
+        let animationFrame = null;
+        let isCanvasReady = false;
 
+        function resizeCanvas() {
+            // Small canvas = minimal CPU usage (we only need blurry colors)
+            const size = 64;
+            canvas.width = size;
+            canvas.height = size;
+            isCanvasReady = true;
+        }
+        resizeCanvas();
+
+        function updateAmbientGlow() {
+            if (!isCanvasReady || mainVideo.readyState < 2) {
+                animationFrame = requestAnimationFrame(updateAmbientGlow);
+                return;
+            }
+
+            // Draw the current video frame onto the tiny canvas
+            ctx.drawImage(mainVideo, 0, 0, canvas.width, canvas.height);
+
+            // Continue sampling every frame (but the canvas is tiny, so it's cheap)
+            animationFrame = requestAnimationFrame(updateAmbientGlow);
+        }
+
+        // Start the glow when the video plays
         player.on('play', () => {
-            bgVideo.play().catch(() => {});
+            if (!animationFrame) {
+                updateAmbientGlow();
+            }
         });
 
         player.on('pause', () => {
-            bgVideo.pause();
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
         });
 
+        // Capture a frame when the user seeks
         player.on('seeked', () => {
-            bgVideo.currentTime = mainVideo.currentTime;
+            if (mainVideo.readyState >= 2) {
+                ctx.drawImage(mainVideo, 0, 0, canvas.width, canvas.height);
+            }
         });
 
-        player.on('timeupdate', () => {
-            if (Math.abs(bgVideo.currentTime - mainVideo.currentTime) > 0.3) {
-                bgVideo.currentTime = mainVideo.currentTime;
+        // Initial capture when metadata loads
+        player.on('loadedmetadata', () => {
+            resizeCanvas();
+            if (mainVideo.readyState >= 2) {
+                ctx.drawImage(mainVideo, 0, 0, canvas.width, canvas.height);
+            }
+        });
+
+        // Also draw a frame when the user clicks play (in case it was paused)
+        player.on('playing', () => {
+            if (mainVideo.readyState >= 2) {
+                ctx.drawImage(mainVideo, 0, 0, canvas.width, canvas.height);
             }
         });
 
         // =============================================
-        // 3. CTA BUTTON TIMING (SHOW AT 10 SECONDS LEFT)
+        // 3. CTA BUTTON TIMING (10 SECONDS LEFT)
         // =============================================
         const ctaWrapper = document.getElementById('ctaWrapper');
         let ctaShown = false;
@@ -369,10 +342,8 @@
 
         player.on('timeupdate', () => {
             if (ctaShown) return;
-
             const duration = player.duration;
             const currentTime = player.currentTime;
-
             const threshold = duration > 15 ? duration - 10 : 5;
 
             if (currentTime >= threshold && !ctaShown) {
@@ -382,7 +353,7 @@
         });
 
         // =============================================
-        // 4. CTA BUTTON ACTION: SAVE CONTACT AS vCard
+        // 4. CTA BUTTON: SAVE CONTACT AS vCard
         // =============================================
         document.getElementById('ctaButton').addEventListener('click', function() {
             const vcardData = `BEGIN:VCARD
@@ -393,37 +364,21 @@
 
             const blob = new Blob([vcardData], { type: 'text/vcard;charset=utf-8' });
             const url = URL.createObjectURL(blob);
-
             const link = document.createElement('a');
             link.href = url;
             link.download = 'Past_Owner_of_My_RV.vcf';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-
-            setTimeout(() => {
-                URL.revokeObjectURL(url);
-            }, 100);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
 
             const btn = this;
             const originalText = btn.innerHTML;
             btn.innerHTML = '✅ Saved!';
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-            }, 2500);
+            setTimeout(() => btn.innerHTML = originalText, 2500);
         });
 
-        // =============================================
-        // 5. AUTO-PLAY BACKGROUND ON PAGE LOAD
-        // =============================================
-        document.addEventListener('DOMContentLoaded', () => {
-            bgVideo.play().catch(() => {});
-        });
-
-        console.log('🎬 RV Video Player loaded!');
-        console.log('📞 CTA appears when 10 seconds remain.');
-        console.log('📱 Portrait video is now fully visible!');
+        console.log('🎬 Ambient Glow active – colors from video fill the empty space!');
     </script>
-
 </body>
 </html>
