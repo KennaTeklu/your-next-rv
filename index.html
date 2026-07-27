@@ -1,28 +1,395 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Video</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My RV Video</title>
+
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
     <style>
-        body {
+        /* ===== RESET & BASE ===== */
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             background: #000;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-        video {
+
+        /* ===== VIDEO WRAPPER ===== */
+        .video-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        /* ===== BACKGROUND BLUR ===== */
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(40px) brightness(0.6);
+            transform: scale(1.1); /* Prevents edge artifacts from blur */
+            opacity: 0.9;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ===== MAIN VIDEO CONTAINER ===== */
+        .video-container {
+            position: relative;
+            z-index: 2;
             max-width: 100%;
             max-height: 100vh;
+            width: auto;
+            height: auto;
+        }
+
+        /* Plyr custom sizing */
+        .plyr {
+            width: 100%;
+            height: 100%;
+            max-height: 100vh;
+        }
+
+        .plyr__video-wrapper {
+            background: transparent !important;
+        }
+
+        /* ===== CTA BUTTON WRAPPER ===== */
+        .cta-wrapper {
+            position: absolute;
+            bottom: 100px;
+            right: 30px;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            pointer-events: none;
+        }
+
+        .cta-wrapper.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ===== PULSING NEON BUTTON ===== */
+        .cta-button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 30px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 60px;
+            color: #fff;
+            font-size: 22px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
+            /* The glowing border animation is handled by the ::before pseudo-element */
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* The glowing border ring */
+        .cta-button::before {
+            content: "";
+            position: absolute;
+            inset: -3px;
+            border-radius: 60px;
+            padding: 3px;
+            background: conic-gradient(
+                from 0deg,
+                #00ffc8,
+                #00d4ff,
+                #7b2ffc,
+                #ff6fd8,
+                #00ffc8
+            );
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: rotateBorder 3s linear infinite;
+            pointer-events: none;
+        }
+
+        /* The pulsing glow behind the button */
+        .cta-button::after {
+            content: "";
+            position: absolute;
+            inset: -8px;
+            border-radius: 60px;
+            background: conic-gradient(
+                from 0deg,
+                rgba(0, 255, 200, 0.4),
+                rgba(0, 212, 255, 0.4),
+                rgba(123, 47, 252, 0.4),
+                rgba(255, 111, 216, 0.4),
+                rgba(0, 255, 200, 0.4)
+            );
+            background-size: 300% 300%;
+            filter: blur(20px);
+            animation: rotateBorder 3s linear infinite;
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes rotateBorder {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ===== BUTTON CONTENT ===== */
+        .cta-price {
+            color: #00ffc8;
+            font-size: 24px;
+        }
+
+        .cta-phone-icon {
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .cta-label {
+            color: #fff;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .cta-wrapper {
+                bottom: 80px;
+                right: 50%;
+                transform: translateX(50%) translateY(20px);
+                width: 90%;
+                max-width: 320px;
+            }
+            .cta-wrapper.visible {
+                transform: translateX(50%) translateY(0);
+            }
+            .cta-button {
+                width: 100%;
+                justify-content: center;
+                padding: 14px 20px;
+                font-size: 18px;
+            }
+            .cta-price {
+                font-size: 20px;
+            }
+            .cta-phone-icon {
+                font-size: 24px;
+            }
+            .cta-label {
+                font-size: 14px;
+            }
+            .video-background {
+                filter: blur(30px) brightness(0.5);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cta-wrapper {
+                bottom: 70px;
+            }
+            .cta-button {
+                padding: 12px 16px;
+                font-size: 16px;
+            }
+            .cta-price {
+                font-size: 18px;
+            }
+            .video-background {
+                filter: blur(20px) brightness(0.4);
+            }
         }
     </style>
 </head>
 <body>
-<video controls playsinline>
-    <source src="myvideo.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+
+    <div class="video-wrapper">
+        <!-- ===== BACKGROUND BLUR VIDEO ===== -->
+        <video class="video-background" autoplay muted playsinline>
+            <source src="myvideo.mp4" type="video/mp4" />
+        </video>
+
+        <!-- ===== MAIN VIDEO ===== -->
+        <div class="video-container">
+            <video id="player" controls playsinline>
+                <source src="myvideo.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <!-- ===== CTA BUTTON ===== -->
+        <div class="cta-wrapper" id="ctaWrapper">
+            <button class="cta-button" id="ctaButton">
+                <span class="cta-price">$19.5k</span>
+                <span class="cta-phone-icon">📞</span>
+                <span class="cta-label">Call Now</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== PLYR ===== -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+    <script>
+        // =============================================
+        // 1. INITIALIZE PLYR
+        // =============================================
+        const player = new Plyr('#player', {
+            controls: [
+                'play-large',
+                'play',
+                'progress',
+                'current-time',
+                'duration',
+                'mute',
+                'volume',
+                'fullscreen'
+            ],
+            autoplay: false,
+            muted: false
+        });
+
+        // =============================================
+        // 2. SYNC BACKGROUND VIDEO WITH MAIN VIDEO
+        // =============================================
+        const bgVideo = document.querySelector('.video-background');
+        const mainVideo = document.querySelector('#player');
+
+        // When the main video plays, play the background
+        player.on('play', () => {
+            bgVideo.play().catch(() => {});
+        });
+
+        // When the main video pauses, pause the background
+        player.on('pause', () => {
+            bgVideo.pause();
+        });
+
+        // When the main video seeks, seek the background
+        player.on('seeked', () => {
+            bgVideo.currentTime = mainVideo.currentTime;
+        });
+
+        // Keep background in sync during normal playback
+        player.on('timeupdate', () => {
+            // Only sync if the difference is more than 0.3 seconds (avoid jitter)
+            if (Math.abs(bgVideo.currentTime - mainVideo.currentTime) > 0.3) {
+                bgVideo.currentTime = mainVideo.currentTime;
+            }
+        });
+
+        // =============================================
+        // 3. CTA BUTTON TIMING (SHOW AT 10 SECONDS LEFT)
+        // =============================================
+        const ctaWrapper = document.getElementById('ctaWrapper');
+        let ctaShown = false;
+
+        player.on('loadedmetadata', () => {
+            // Reset state when a new video loads
+            ctaShown = false;
+            ctaWrapper.classList.remove('visible');
+        });
+
+        player.on('timeupdate', () => {
+            if (ctaShown) return;
+
+            const duration = player.duration;
+            const currentTime = player.currentTime;
+
+            // If duration is unknown or video is too short (< 15 sec), show at 5 sec
+            const threshold = duration > 15 ? duration - 10 : 5;
+
+            if (currentTime >= threshold && !ctaShown) {
+                ctaShown = true;
+                ctaWrapper.classList.add('visible');
+            }
+        });
+
+        // =============================================
+        // 4. CTA BUTTON ACTION: SAVE CONTACT AS vCard
+        // =============================================
+        document.getElementById('ctaButton').addEventListener('click', function() {
+            // Create a vCard (.vcf) file
+            const vcardData = `BEGIN:VCARD
+        VERSION:3.0
+        FN:Past Owner of My RV
+        TEL;TYPE=CELL:6022816259
+        END:VCARD`;
+
+            const blob = new Blob([vcardData], { type: 'text/vcard;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+
+            // Create a hidden download link
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Past_Owner_of_My_RV.vcf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Clean up the URL
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 100);
+
+            // Optional: Show a quick feedback
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Contact Saved!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2500);
+        });
+
+        // =============================================
+        // 5. AUTO-PLAY BACKGROUND ON PAGE LOAD
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            bgVideo.play().catch(() => {});
+        });
+
+        console.log('🎬 RV Video Player loaded successfully!');
+        console.log('📞 CTA button will appear when 10 seconds remain.');
+    </script>
+
 </body>
 </html>
