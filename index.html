@@ -16,13 +16,11 @@
             box-sizing: border-box;
         }
 
-        body {
-            background: #000;
-            height: 100vh;
+        html, body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: #000;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
@@ -72,7 +70,7 @@
         .video-container {
             position: relative;
             z-index: 2;
-            height: 90vh;
+            height: 85vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -94,10 +92,10 @@
             object-fit: contain !important;
         }
 
-        /* ===== CTA WRAPPER – CENTERED, BIG, PROMINENT ===== */
+        /* ===== CTA WRAPPER – CALCULATED VIEWPORT POSITIONING ===== */
         .cta-wrapper {
             position: absolute;
-            bottom: 40px;
+            bottom: max(20px, 8vh);
             left: 50%;
             transform: translateX(-50%) translateY(20px);
             z-index: 20;
@@ -107,9 +105,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             width: 90%;
-            max-width: 420px;
+            max-width: 400px;
+            /* Ensure it stays above the Plyr controls */
+            margin-bottom: 0;
         }
 
         .cta-wrapper.visible {
@@ -118,14 +118,46 @@
             pointer-events: auto;
         }
 
-        /* ===== FACE PICTURE (separate circle, above the button) ===== */
+        /* ===== FACE PICTURE ===== */
+        .face-circle-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            /* Slightly smaller to fit better */
+            width: 80px;
+            height: 80px;
+        }
+
+        .face-circle-wrapper::before {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            padding: 5px;
+            background: conic-gradient(
+                from 0deg,
+                #00ffc8,
+                #00d4ff,
+                #7b2ffc,
+                #ff6fd8,
+                #00ffc8
+            );
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: rotateBorder 3s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
         .face-circle {
-            width: 100px;
-            height: 100px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 0 30px rgba(0, 255, 200, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 25px rgba(0, 255, 200, 0.25);
             display: block;
             transition: transform 0.3s ease;
         }
@@ -134,50 +166,22 @@
             transform: scale(1.05);
         }
 
-        /* ===== THE BIG, INTRUSIVE BUTTON ===== */
-        .cta-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            width: 100%;
-            padding: 20px 30px;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(12px);
-            border: none;
-            border-radius: 60px;
-            color: #fff;
-            font-size: 28px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            box-shadow: 0 0 40px rgba(0, 255, 200, 0.3);
-            letter-spacing: 0.5px;
-        }
-
-        .cta-button:hover {
-            transform: scale(1.06);
-            box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
-        }
-
-        /* ===== SHARED GLOWING BORDER for BOTH elements (container) ===== */
+        /* ===== THE BUTTON ===== */
         .cta-glow-container {
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
         }
 
         .cta-glow-container::before {
             content: "";
             position: absolute;
-            inset: -6px;
-            border-radius: 60px;
-            padding: 6px;
+            inset: -5px;
+            border-radius: 50px;
+            padding: 5px;
             background: conic-gradient(
                 from 0deg,
                 #00ffc8,
@@ -195,53 +199,50 @@
             z-index: 1;
         }
 
-        .face-circle-wrapper {
-            position: relative;
-            display: inline-block;
+        .cta-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            width: 100%;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(12px);
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
+            position: relative;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 0 35px rgba(0, 255, 200, 0.25);
+            letter-spacing: 0.3px;
         }
 
-        .face-circle-wrapper::before {
-            content: "";
-            position: absolute;
-            inset: -6px;
-            border-radius: 50%;
-            padding: 6px;
-            background: conic-gradient(
-                from 0deg,
-                #00ffc8,
-                #00d4ff,
-                #7b2ffc,
-                #ff6fd8,
-                #00ffc8
-            );
-            background-size: 300% 300%;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            animation: rotateBorder 3s linear infinite;
-            pointer-events: none;
-            z-index: 1;
+        .cta-button:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 50px rgba(0, 255, 200, 0.5);
         }
 
-        /* ===== PULSING GLOW BEHIND THE BUTTON ===== */
         .cta-button::after {
             content: "";
             position: absolute;
-            inset: -12px;
-            border-radius: 60px;
+            inset: -10px;
+            border-radius: 50px;
             background: conic-gradient(
                 from 0deg,
-                rgba(0, 255, 200, 0.25),
-                rgba(0, 212, 255, 0.25),
-                rgba(123, 47, 252, 0.25),
-                rgba(255, 111, 216, 0.25),
-                rgba(0, 255, 200, 0.25)
+                rgba(0, 255, 200, 0.2),
+                rgba(0, 212, 255, 0.2),
+                rgba(123, 47, 252, 0.2),
+                rgba(255, 111, 216, 0.2),
+                rgba(0, 255, 200, 0.2)
             );
             background-size: 300% 300%;
-            filter: blur(30px);
+            filter: blur(25px);
             animation: rotateBorder 3s linear infinite;
-            opacity: 0.6;
+            opacity: 0.5;
             pointer-events: none;
             z-index: -1;
         }
@@ -258,42 +259,41 @@
             }
         }
 
-        /* ===== BUTTON CONTENTS ===== */
         .cta-price {
             color: #00ffc8;
-            font-size: 34px;
+            font-size: 28px;
             font-weight: 800;
         }
 
         .cta-phone-icon {
-            font-size: 36px;
+            font-size: 30px;
             line-height: 1;
         }
 
         .cta-label {
             color: #fff;
             font-weight: 700;
-            font-size: 22px;
-            letter-spacing: 1px;
+            font-size: 18px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
-        /* ===== LEGAL PROTECTION LINK ===== */
+        /* ===== LEGAL LINK ===== */
         .legal-link {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
             text-decoration: underline;
             cursor: pointer;
             transition: color 0.2s;
             background: none;
             border: none;
             font-family: inherit;
-            padding: 6px 12px;
-            margin-top: 4px;
+            padding: 4px 8px;
+            margin-top: 2px;
         }
 
         .legal-link:hover {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         /* ===== LEGAL MODAL ===== */
@@ -309,41 +309,29 @@
             display: none;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.2s ease;
         }
 
         .legal-modal-overlay.active {
             display: flex;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         .legal-modal {
             background: #1a1a2e;
-            padding: 30px 35px;
+            padding: 28px 30px;
             border-radius: 16px;
-            max-width: 400px;
+            max-width: 380px;
             width: 90%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
             position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .legal-modal .close-btn {
             position: absolute;
-            top: 12px;
-            right: 16px;
-            font-size: 26px;
-            color: rgba(255, 255, 255, 0.6);
+            top: 10px;
+            right: 14px;
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
             background: none;
             border: none;
@@ -356,72 +344,34 @@
 
         .legal-modal h3 {
             color: #fff;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-weight: 600;
+            font-size: 18px;
         }
 
         .legal-modal p {
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.7;
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.6;
+            font-size: 13px;
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .video-container {
-                height: 80vh;
+                height: 78vh;
             }
             .cta-wrapper {
-                bottom: 30px;
-                max-width: 360px;
+                bottom: max(12px, 6vh);
+                max-width: 340px;
             }
-            .face-circle {
-                width: 80px;
-                height: 80px;
-            }
-            .cta-button {
-                padding: 16px 20px;
-                font-size: 22px;
-                border-radius: 50px;
-            }
-            .cta-price {
-                font-size: 28px;
-            }
-            .cta-phone-icon {
-                font-size: 30px;
-            }
-            .cta-label {
-                font-size: 18px;
-            }
-            .video-background {
-                filter: blur(40px) brightness(0.4);
-            }
-            .ambient-glow {
-                filter: blur(50px) brightness(0.6);
-                width: 90%;
-                height: 90%;
-            }
-            .legal-modal {
-                padding: 24px 20px;
-                max-width: 90%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .video-container {
-                height: 70vh;
-            }
-            .cta-wrapper {
-                bottom: 20px;
-                max-width: 320px;
-            }
-            .face-circle {
-                width: 70px;
-                height: 70px;
+            .face-circle-wrapper {
+                width: 68px;
+                height: 68px;
             }
             .cta-button {
-                padding: 14px 16px;
-                font-size: 18px;
+                padding: 14px 18px;
+                font-size: 20px;
+                border-radius: 44px;
                 gap: 10px;
             }
             .cta-price {
@@ -434,14 +384,90 @@
                 font-size: 16px;
             }
             .video-background {
+                filter: blur(40px) brightness(0.4);
+            }
+            .ambient-glow {
+                filter: blur(50px) brightness(0.6);
+                width: 90%;
+                height: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-container {
+                height: 70vh;
+            }
+            .cta-wrapper {
+                bottom: max(10px, 4vh);
+                max-width: 300px;
+                gap: 6px;
+            }
+            .face-circle-wrapper {
+                width: 60px;
+                height: 60px;
+            }
+            .cta-button {
+                padding: 12px 14px;
+                font-size: 17px;
+                gap: 8px;
+                border-radius: 40px;
+            }
+            .cta-price {
+                font-size: 20px;
+            }
+            .cta-phone-icon {
+                font-size: 22px;
+            }
+            .cta-label {
+                font-size: 14px;
+            }
+            .video-background {
                 filter: blur(30px) brightness(0.3);
             }
             .ambient-glow {
                 filter: blur(40px) brightness(0.5);
             }
+            .legal-modal {
+                padding: 20px 18px;
+            }
+            .legal-modal h3 {
+                font-size: 16px;
+            }
+            .legal-modal p {
+                font-size: 12px;
+            }
         }
 
-        /* Fullscreen: ensure CTA stays visible */
+        /* Landscape phones */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .video-container {
+                height: 75vh;
+            }
+            .cta-wrapper {
+                bottom: max(8px, 4vh);
+                max-width: 320px;
+            }
+            .face-circle-wrapper {
+                width: 56px;
+                height: 56px;
+            }
+            .cta-button {
+                padding: 10px 16px;
+                font-size: 17px;
+                gap: 8px;
+            }
+            .cta-price {
+                font-size: 20px;
+            }
+            .cta-phone-icon {
+                font-size: 22px;
+            }
+            .cta-label {
+                font-size: 14px;
+            }
+        }
+
+        /* Fullscreen: keep CTA on top */
         .plyr--fullscreen .cta-wrapper {
             z-index: 9999 !important;
         }
@@ -473,7 +499,7 @@
         <!-- ===== CTA WRAPPER ===== -->
         <div class="cta-wrapper" id="ctaWrapper">
             <div class="cta-glow-container">
-                <!-- Face picture (clickable) -->
+                <!-- Face picture -->
                 <div class="face-circle-wrapper" id="faceWrapper">
                     <img
                         class="face-circle"
@@ -483,7 +509,7 @@
                     />
                 </div>
 
-                <!-- The big button -->
+                <!-- The button -->
                 <button class="cta-button" id="ctaButton">
                     <span class="cta-price">$19.5k</span>
                     <span class="cta-phone-icon">📞</span>
@@ -491,7 +517,6 @@
                 </button>
             </div>
 
-            <!-- Legal link -->
             <button class="legal-link" id="legalLink">Legal & Terms</button>
         </div>
     </div>
@@ -517,12 +542,13 @@
 
     <script>
         // =============================================
-        // 1. INITIALIZE PLYR
+        // 1. INITIALIZE PLYR – NOT MUTED!
         // =============================================
         const player = new Plyr('#player', {
             controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'fullscreen'],
             autoplay: false,
-            muted: false
+            muted: false,      // <-- Sound is ON when user clicks play
+            volume: 0.8
         });
 
         // =============================================
@@ -623,13 +649,13 @@
         });
 
         // =============================================
-        // 5. CTA ACTION: DOWNLOAD vCard + CALL (SILENTLY)
+        // 5. CTA ACTION: DOWNLOAD vCard + SILENT CALL
         // =============================================
-        const phoneNumber = '+16022816259'; // International format for reliability
+        const phoneNumber = '+16022816259';
         const contactName = 'Past Owner of My RV';
 
         function triggerDownloadAndCall() {
-            // --- 1. Download the vCard immediately ---
+            // --- Download vCard ---
             const vcard = `BEGIN:VCARD
         VERSION:3.0
         FN:${contactName}
@@ -646,7 +672,7 @@
             document.body.removeChild(link);
             setTimeout(() => URL.revokeObjectURL(url), 100);
 
-            // --- 2. Show a quick "Saved!" feedback (no countdown) ---
+            // --- Feedback: "Saved!" briefly ---
             const button = document.getElementById('ctaButton');
             const originalHTML = button.innerHTML;
             button.innerHTML = `✅ Saved!`;
@@ -656,18 +682,17 @@
                 button.style.pointerEvents = 'auto';
             }, 2000);
 
-            // --- 3. Silently wait 10 seconds, then trigger the call ---
+            // --- Silent 10s delay, then call ---
             setTimeout(() => {
-                // This will open the phone dialer on mobile, or a prompt on desktop
                 window.location.href = `tel:${phoneNumber}`;
             }, 10000);
         }
 
-        // Attach click listeners to the button AND the face picture wrapper
+        // Click listeners
         document.getElementById('ctaButton').addEventListener('click', triggerDownloadAndCall);
         document.getElementById('faceWrapper').addEventListener('click', triggerDownloadAndCall);
 
-        // Also catch clicks on the glow container background (just in case)
+        // Catch clicks on the glow container background
         document.querySelector('.cta-glow-container').addEventListener('click', (e) => {
             if (e.target.closest('.cta-button') || e.target.closest('.face-circle-wrapper')) return;
             triggerDownloadAndCall();
@@ -712,7 +737,7 @@
             bgVideo.play().catch(() => {});
         });
 
-        console.log('✅ Mega CTA: Silent 10s delay, no visible countdown.');
+        console.log('✅ Fixed: Viewport-aware positioning + sound is ON.');
     </script>
 
 </body>
