@@ -34,26 +34,60 @@
             justify-content: center;
             align-items: center;
             background: #000;
+            overflow: hidden;
         }
 
-        /* ===== MAIN VIDEO ===== */
+        /* ===== BACKGROUND BLUR (VIBES WITH VIDEO COLORS) ===== */
+        .video-background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%) scale(1.2);
+            object-fit: cover;
+            filter: blur(50px) brightness(0.5);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ===== MAIN VIDEO - FULLY VISIBLE ===== */
         .video-container {
             position: relative;
             z-index: 2;
-            max-width: 100%;
-            max-height: 100vh;
             width: auto;
-            height: auto;
-        }
-
-        .plyr {
-            width: 100%;
-            height: 100%;
+            height: 90vh;
             max-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .plyr__video-wrapper {
+        /* Make Plyr respect the container size */
+        .video-container .plyr {
+            width: auto;
+            height: 100%;
+            max-height: 90vh;
+        }
+
+        .video-container .plyr__video-wrapper {
+            height: 100% !important;
             background: transparent !important;
+        }
+
+        .video-container video {
+            height: 100% !important;
+            width: auto !important;
+            max-height: 90vh;
+            object-fit: contain !important;
+        }
+
+        /* Hide Plyr's default poster/overlay that might crop */
+        .plyr__poster {
+            background-size: contain !important;
+            background-position: center !important;
         }
 
         /* ===== CTA BUTTON WRAPPER ===== */
@@ -175,6 +209,12 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
+            .video-container {
+                height: 80vh;
+            }
+            .video-container video {
+                max-height: 80vh !important;
+            }
             .cta-wrapper {
                 bottom: 80px;
                 right: 50%;
@@ -200,9 +240,20 @@
             .cta-label {
                 font-size: 14px;
             }
+            .video-background {
+                filter: blur(40px) brightness(0.4);
+                min-height: 100%;
+                min-width: 100%;
+            }
         }
 
         @media (max-width: 480px) {
+            .video-container {
+                height: 70vh;
+            }
+            .video-container video {
+                max-height: 70vh !important;
+            }
             .cta-wrapper {
                 bottom: 70px;
             }
@@ -213,12 +264,34 @@
             .cta-price {
                 font-size: 18px;
             }
+            .video-background {
+                filter: blur(30px) brightness(0.3);
+            }
+        }
+
+        /* Landscape phone - keep video visible */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .video-container {
+                height: 70vh;
+            }
+            .video-container video {
+                max-height: 70vh !important;
+            }
+            .cta-wrapper {
+                bottom: 40px;
+                right: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="video-wrapper">
+        <!-- ===== BACKGROUND BLUR VIDEO ===== -->
+        <video class="video-background" autoplay muted playsinline>
+            <source src="myvideo.mp4" type="video/mp4" />
+        </video>
+
         <!-- ===== MAIN VIDEO ===== -->
         <div class="video-container">
             <video id="player" controls playsinline>
@@ -260,7 +333,31 @@
         });
 
         // =============================================
-        // 2. CTA BUTTON TIMING (SHOW AT 10 SECONDS LEFT)
+        // 2. SYNC BACKGROUND VIDEO WITH MAIN VIDEO
+        // =============================================
+        const bgVideo = document.querySelector('.video-background');
+        const mainVideo = document.querySelector('#player');
+
+        player.on('play', () => {
+            bgVideo.play().catch(() => {});
+        });
+
+        player.on('pause', () => {
+            bgVideo.pause();
+        });
+
+        player.on('seeked', () => {
+            bgVideo.currentTime = mainVideo.currentTime;
+        });
+
+        player.on('timeupdate', () => {
+            if (Math.abs(bgVideo.currentTime - mainVideo.currentTime) > 0.3) {
+                bgVideo.currentTime = mainVideo.currentTime;
+            }
+        });
+
+        // =============================================
+        // 3. CTA BUTTON TIMING (SHOW AT 10 SECONDS LEFT)
         // =============================================
         const ctaWrapper = document.getElementById('ctaWrapper');
         let ctaShown = false;
@@ -276,7 +373,6 @@
             const duration = player.duration;
             const currentTime = player.currentTime;
 
-            // Show when 10 seconds left, or at 5 seconds if video is short
             const threshold = duration > 15 ? duration - 10 : 5;
 
             if (currentTime >= threshold && !ctaShown) {
@@ -286,7 +382,7 @@
         });
 
         // =============================================
-        // 3. CTA BUTTON ACTION: SAVE CONTACT AS vCard
+        // 4. CTA BUTTON ACTION: SAVE CONTACT AS vCard
         // =============================================
         document.getElementById('ctaButton').addEventListener('click', function() {
             const vcardData = `BEGIN:VCARD
@@ -309,7 +405,6 @@
                 URL.revokeObjectURL(url);
             }, 100);
 
-            // Feedback
             const btn = this;
             const originalText = btn.innerHTML;
             btn.innerHTML = '✅ Saved!';
@@ -318,8 +413,16 @@
             }, 2500);
         });
 
-        console.log('🎬 RV Video Player loaded.');
+        // =============================================
+        // 5. AUTO-PLAY BACKGROUND ON PAGE LOAD
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            bgVideo.play().catch(() => {});
+        });
+
+        console.log('🎬 RV Video Player loaded!');
         console.log('📞 CTA appears when 10 seconds remain.');
+        console.log('📱 Portrait video is now fully visible!');
     </script>
 
 </body>
